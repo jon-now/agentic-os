@@ -1,0 +1,109 @@
+# Core Dependencies
+# Core Dependencies
+numpy==1.26.4
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+requests==2.31.0
+python-dotenv==1.0.0
+python-multipart==0.0.6
+websockets==12.0
+aiofiles==23.2.1
+python-dateutil==2.8.2
+psutil==5.9.6
+uvicorn==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+requests==2.31.0
+python-dotenv==1.0.0
+python-multipart==0.0.6
+websockets==12.0
+aiofiles==23.2.1
+python-dateutil==2.8.2
+psutil==5.9.6
+
+# Automation & Browser Control
+selenium==4.15.2
+PyAutoGUI==0.9.54
+
+# Google Services Integration
+google-auth==2.23.4
+google-auth-oauthlib==1.1.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.108.0
+
+# Vector Database & AI
+chromadb==0.4.18
+faiss-cpu==1.12.0  # Use faiss-gpu==1.7.4 for GPU acceleration if available
+
+# Microsoft Services
+msal==1.25.0
+
+# Communication
+slack-sdk==3.26.1
+aiohttp==3.9.1
+
+# Calendar Integration
+caldav==2.0.1
+
+# Voice Interface Dependencies
+SpeechRecognition==3.14.3
+pyttsx3==2.99
+PyAudio==0.2.14
+faster-whisper==0.10.0
+TTS==0.22.0
+
+# PyTorch (GPU Support) - Choose one set based on your CUDA version:
+# For CUDA 12.1:
+torch==2.5.1+cu121
+torchaudio==2.5.1+cu121
+torchvision==0.20.1+cu121
+# For CUDA 11.8 (alternative - comment out above and uncomment below):
+# torch==2.1.0+cu118
+# torchaudio==2.1.0+cu118
+# torchvision==0.16.0+cu118
+
+# Computer Vision & OCR Dependencies
+# Vision and OCR Dependencies
+opencv-python==4.6.0.66
+easyocr==1.7.0
+# pytesseract==0.3.10  # Alternative OCR engine
+Pillow==11.3.0
+PyMuPDF==1.21.1  # Pre-built version to avoid compilation issues
+pyautogui==0.9.54
+
+# Overlay Interface Dependencies
+pystray==0.19.5
+plyer==2.1.0
+
+# Text Processing & Language Support
+gruut-lang-de==2.0.1
+
+# GHOST Voice Interface Dependencies
+SpeechRecognition==3.10.0
+pyaudio==0.2.11
+pyttsx3==2.90
+gruut-lang-es==2.0.1
+gruut-lang-fr==2.0.2
+gTTS==2.5.4
+
+# Networking & Utilities
+httptools==0.6.4
+typing-extensions==4.12.2
+watchfiles==1.1.0
+wheel==0.45.1
+
+# GPU Monitoring (Optional)
+gpustat==1.1.1
+nvidia-ml-py3==7.352.0
+pynvml==12.0.0
+
+# Development Dependencies (Optional - uncomment if needed)
+black==25.1.0
+flake8==7.3.0
+mypy==1.17.1
+pylint==3.3.8
+pytest-cov==6.2.1
+radon==6.0.1
+pipdeptree==2.28.0

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Agentic OS - Your AI Assistant">
+    
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- PWA icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/icons/icon-512x512.png">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    
+    <title>Agentic OS - Mobile</title>
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100vw;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .message.assistant {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .message.system {
+            background: var(--warning);
+            color: white;
+            text-align: center;
+            margin: 0 auto;
+            font-size: 0.875rem;
+        }
+
+        .input-container {
+            padding: 1rem;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 1.5rem;
+            font-size: 1rem;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            min-height: 48px;
+        }
+
+        .message-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .send-button, .voice-button {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+        }
+
+        .send-button:hover, .voice-button:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .voice-button.listening {
+            background: var(--error);
+            animation: pulse 1s infinite;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .quick-action {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .quick-action:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--error);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            display: none;
+            z-index: 1000;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.125rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .input-container {
+                padding: 0.75rem;
+            }
+        }
+
+        /* iOS specific styling */
+        @supports (-webkit-touch-callout: none) {
+            .input-container {
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Agentic OS</h1>
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Connected</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="connection-status" id="connectionStatus">
+            Reconnecting...
+        </div>
+
+        <div class="chat-container">
+            <div class="quick-actions">
+                <button class="quick-action" onclick="sendQuickMessage('What can you do?')">Capabilities</button>
+                <button class="quick-action" onclick="sendQuickMessage('Check my system status')">System Status</button>
+                <button class="quick-action" onclick="sendQuickMessage('Check my emails')">Emails</button>
+                <button class="quick-action" onclick="sendQuickMessage('Research AI trends')">Research</button>
+                <button class="quick-action" onclick="sendQuickMessage('Hello')">Say Hi</button>
+            </div>
+
+            <div class="messages" id="messages">
+                <div class="message assistant">
+                    👋 Hello! I'm your AI assistant. I can help you with research, email management, system monitoring, and much more. What would you like to do today?
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                Assistant is typing...
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-row">
+                <textarea 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Type your message..."
+                    rows="1"
+                ></textarea>
+                <button class="voice-button" id="voiceButton" onclick="toggleVoice()" title="Voice input">
+                    🎤
+                </button>
+                <button class="send-button" id="sendButton" onclick="sendMessage()" title="Send message">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA installation
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install button/prompt
+        });
+
+        // WebSocket connection
+        let ws = null;
+        let isConnected = false;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function() {
+                isConnected = true;
+                reconnectAttempts = 0;
+                updateConnectionStatus(true);
+                console.log('Connected to Agentic OS');
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            };
+            
+            ws.onclose = function() {
+                isConnected = false;
+                updateConnectionStatus(false);
+                console.log('Disconnected from Agentic OS');
+                attemptReconnect();
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus(false);
+            };
+        }
+
+        function attemptReconnect() {
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                setTimeout(() => {
+                    console.log(`Reconnection attempt ${reconnectAttempts}`);
+                    connectWebSocket();
+                }, 1000 * reconnectAttempts);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const connectionStatus = document.getElementById('connectionStatus');
+            
+            if (connected) {
+                statusDot.style.background = 'var(--success)';
+                statusText.textContent = 'Connected';
+                connectionStatus.style.display = 'none';
+            } else {
+                statusDot.style.background = 'var(--error)';
+                statusText.textContent = 'Disconnected';
+                connectionStatus.style.display = 'block';
+            }
+        }
+
+        function handleMessage(data) {
+            hideTypingIndicator();
+            
+            if (data.type === 'response') {
+                addMessage(data.content, 'assistant');
+            } else if (data.type === 'error') {
+                addMessage(`Error: ${data.content}`, 'system');
+            } else if (data.type === 'status') {
+                addMessage(data.content, 'system');
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || !isConnected) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            adjustTextareaHeight(input);
+            
+            showTypingIndicator();
+            
+            ws.send(JSON.stringify({
+                type: 'message',
+                content: message,
+                timestamp: new Date().toISOString()
+            }));
+        }
+
+        function sendQuickMessage(message) {
+            if (!isConnected) return;
+            
+            addMessage(message, 'user');
+            showTypingIndicator();
+            
+            ws.send(JSON.stringify({
+                type: 'message',
+                content: message,
+                timestamp: new Date().toISOString()
+            }));
+        }
+
+        function addMessage(content, type) {
+            const messages = document.getElementById('messages');
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = content;
+            
+            messages.appendChild(message);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        // Voice functionality
+        let isListening = false;
+        let recognition = null;
+
+        function initVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('messageInput').value = transcript;
+                    adjustTextareaHeight(document.getElementById('messageInput'));
+                };
+                
+                recognition.onend = function() {
+                    isListening = false;
+                    updateVoiceButton();
+                };
+            }
+        }
+
+        function toggleVoice() {
+            if (!recognition) {
+                alert('Voice recognition not supported in this browser');
+                return;
+            }
+            
+            if (isListening) {
+                recognition.stop();
+                isListening = false;
+            } else {
+                recognition.start();
+                isListening = true;
+            }
+            
+            updateVoiceButton();
+        }
+
+        function updateVoiceButton() {
+            const button = document.getElementById('voiceButton');
+            if (isListening) {
+                button.classList.add('listening');
+                button.textContent = '⏹️';
+            } else {
+                button.classList.remove('listening');
+                button.textContent = '🎤';
+            }
+        }
+
+        // Auto-resize textarea
+        function adjustTextareaHeight(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
+            initVoiceRecognition();
+            
+            const input = document.getElementById('messageInput');
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                adjustTextareaHeight(this);
+            });
+        });
+
+        // Service worker registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Prevent zoom on input focus (iOS)
+        document.addEventListener('touchstart', function() {}, true);
+    </script>
+</body>
+</html>
